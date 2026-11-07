@@ -14,23 +14,14 @@ function buildRawHttpRequest(request, originHost, originPort) {
     `Host: ${originHost}:${originPort}`,
     `User-Agent: ${request.headers.get('User-Agent') || 'CareFluff-MapProxy/1.0'}`,
     `Accept: ${request.headers.get('Accept') || '*/*'}`,
-    'Connection: close',
+    'Accept-Encoding: identity',
     '',
     '',
   ];
   return new TextEncoder().encode(lines.join('\r\n'));
 }
 
-async function readStreamToBytes(readable) {
-  const reader = readable.getReader();
-  const chunks = [];
-  let total = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    total += value.byteLength;
-  }
+function concatChunks(chunks, total) {
   const merged = new Uint8Array(total);
   let offset = 0;
   for (const chunk of chunks) {
@@ -40,11 +31,16 @@ async function readStreamToBytes(readable) {
   return merged;
 }
 
-function findHeaderBoundary(buffer) {
-  for (let i = 0; i < buffer.length - 3; i++) {
-    const isCrLf = buffer[i] === 13 && buffer[i + 1] === 10;
-    const isDouble = isCrLf && buffer[i + 2] === 13 && buffer[i + 3] === 10;
-    if (isDouble) return i;
+function findHeaderBoundary(buf) {
+  for (let i = 0; i < buf.length - 3; i++) {
+    if (
+      buf[i] === 13 &&
+      buf[i + 1] === 10 &&
+      buf[i + 2] === 13 &&
+      buf[i + 3] === 10
+    ) {
+      return i;
+    }
   }
   return -1;
 }
@@ -54,17 +50,106 @@ function parseHttpHeaders(headerText) {
   const match = (lines[0] || '').match(/HTTP\/\d\.\d\s+(\d+)/);
   const status = match ? Number(match[1]) : 200;
   const headers = new Headers({ 'Access-Control-Allow-Origin': '*' });
+  let isChunked = false;
+  let contentLength = -1;
   for (const line of lines.slice(1)) {
     const idx = line.indexOf(':');
     if (idx > 0) {
       const key = line.slice(0, idx).trim();
       const val = line.slice(idx + 1).trim();
-      if (!/^(transfer-encoding|connection)$/i.test(key)) {
+      if (/^transfer-encoding$/i.test(key) && /chunked/i.test(val)) {
+        isChunked = true;
+      } else if (/^content-length$/i.test(key)) {
+        contentLength = Number(val);
+      } else if (!/^(transfer-encoding|connection|content-length)$/i.test(key)) {
         headers.set(key, val);
       }
     }
   }
-  return { status, headers };
+  return { status, headers, isChunked, contentLength };
+}
+
+function decodeChunkedBody(buf) {
+  const pieces = [];
+  let total = 0;
+  let pos = 0;
+  while (pos < buf.length) {
+    let lineEnd = -1;
+    for (let i = pos; i < buf.length - 1; i++) {
+      if (buf[i] === 13 && buf[i + 1] === 10) {
+        lineEnd = i;
+        break;
+      }
+    }
+    if (lineEnd === -1) return { complete: false, body: null };
+    const sizeHex = new TextDecoder()
+      .decode(buf.subarray(pos, lineEnd))
+      .split(';')[0]
+      .trim();
+    const chunkSize = parseInt(sizeHex, 16);
+    if (Number.isNaN(chunkSize)) return { complete: false, body: null };
+    if (chunkSize === 0) {
+      if (buf.length >= lineEnd + 4) {
+        return { complete: true, body: concatChunks(pieces, total) };
+      }
+      return { complete: false, body: null };
+    }
+    const dataStart = lineEnd + 2;
+    const dataEnd = dataStart + chunkSize;
+    if (buf.length < dataEnd + 2) return { complete: false, body: null };
+    pieces.push(buf.subarray(dataStart, dataEnd));
+    total += chunkSize;
+    pos = dataEnd + 2;
+  }
+  return { complete: false, body: null };
+}
+
+async function readHttpResponse(readable, method) {
+  const reader = readable.getReader();
+  const chunks = [];
+  let total = 0;
+  let parsed = null;
+  let bodyOffset = -1;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (value) {
+      chunks.push(value);
+      total += value.byteLength;
+    }
+    const buf = concatChunks(chunks, total);
+    if (!parsed) {
+      const splitIdx = findHeaderBoundary(buf);
+      if (splitIdx !== -1) {
+        const headerStr = new TextDecoder().decode(buf.subarray(0, splitIdx));
+        parsed = parseHttpHeaders(headerStr);
+        bodyOffset = splitIdx + 4;
+      }
+    }
+    if (parsed) {
+      if (method === 'HEAD' || parsed.status === 204 || parsed.status === 304) {
+        return { ...parsed, body: new Uint8Array(0) };
+      }
+      const rawBody = buf.subarray(bodyOffset);
+      if (parsed.isChunked) {
+        const decoded = decodeChunkedBody(rawBody);
+        if (decoded.complete) {
+          return { ...parsed, body: decoded.body };
+        }
+      } else if (parsed.contentLength >= 0) {
+        if (rawBody.byteLength >= parsed.contentLength) {
+          return {
+            ...parsed,
+            body: rawBody.subarray(0, parsed.contentLength),
+          };
+        }
+      } else if (done) {
+        return { ...parsed, body: rawBody };
+      }
+    }
+    if (done) break;
+  }
+  return null;
 }
 
 export default {
@@ -74,20 +159,22 @@ export default {
     }
     const originHost = env.ORIGIN_HOST || 'carefur.nitro.games';
     const originPort = Number(env.ORIGIN_PORT || 25969);
+    const socket = connect({ hostname: originHost, port: originPort });
     try {
-      const socket = connect({ hostname: originHost, port: originPort });
       const writer = socket.writable.getWriter();
       await writer.write(buildRawHttpRequest(request, originHost, originPort));
-      await writer.close();
-      const raw = await readStreamToBytes(socket.readable);
-      const splitIdx = findHeaderBoundary(raw);
-      if (splitIdx === -1) {
+      writer.releaseLock();
+      const res = await readHttpResponse(socket.readable, request.method);
+      socket.close();
+      if (!res) {
         return new Response('BlueMap starting on 25969', { status: 502 });
       }
-      const headerStr = new TextDecoder().decode(raw.subarray(0, splitIdx));
-      const { status, headers } = parseHttpHeaders(headerStr);
-      return new Response(raw.subarray(splitIdx + 4), { status, headers });
+      return new Response(res.body, {
+        status: res.status,
+        headers: res.headers,
+      });
     } catch (err) {
+      socket.close();
       return new Response(`BlueMap Proxy Error: ${err.message}`, {
         status: 502,
       });
