@@ -1,0 +1,86 @@
+---
+import { css } from '../../../styled-system/css';
+
+interface Props {
+  href?: string;
+  variant?: 'pink' | 'cyan' | 'purple' | 'teal' | 'yellow';
+  size?: 'sm' | 'md' | 'lg';
+  external?: boolean;
+  id?: string;
+  type?: 'button' | 'submit';
+}
+
+const {
+  href,
+  variant = 'pink',
+  size = 'md',
+  external = false,
+  id,
+  type = 'button',
+} = Astro.props;
+
+const themes = {
+  pink: {
+    bg: 'linear-gradient(135deg, rgba(255, 51, 153, 0.52) 0%, rgba(184, 41, 255, 0.52) 100%)',
+    border: 'rgba(255, 194, 229, 0.8)',
+    shadow: '0 8px 24px rgba(255, 51, 153, 0.35), inset 0 1px 3px rgba(255, 255, 255, 0.45)',
+    color: '#fff5fb',
+  },
+  cyan: {
+    bg: 'linear-gradient(135deg, rgba(0, 190, 235, 0.46) 0%, rgba(124, 58, 237, 0.48) 100%)',
+    border: 'rgba(179, 245, 255, 0.8)',
+    shadow: '0 8px 24px rgba(0, 240, 255, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.45)',
+    color: '#e6fcff',
+  },
+  purple: {
+    bg: 'linear-gradient(135deg, rgba(184, 41, 255, 0.45) 0%, rgba(109, 40, 217, 0.52) 100%)',
+    border: 'rgba(224, 179, 255, 0.75)',
+    shadow: '0 8px 24px rgba(184, 41, 255, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.4)',
+    color: '#f7ebff',
+  },
+  teal: {
+    bg: 'linear-gradient(135deg, rgba(0, 210, 175, 0.45) 0%, rgba(0, 160, 225, 0.48) 100%)',
+    border: 'rgba(166, 255, 234, 0.8)',
+    shadow: '0 8px 24px rgba(0, 255, 200, 0.28), inset 0 1px 3px rgba(255, 255, 255, 0.45)',
+    color: '#e6fffa',
+  },
+  yellow: {
+    bg: 'linear-gradient(135deg, rgba(255, 170, 0, 0.48) 0%, rgba(255, 51, 153, 0.48) 100%)',
+    border: 'rgba(255, 242, 179, 0.85)',
+    shadow: '0 8px 24px rgba(255, 180, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.45)',
+    color: '#fffbeb',
+  },
+}[variant];
+
+const padMap = {
+  sm: '0.5rem 1.05rem; font-size:0.88rem;',
+  md: '0.75rem 1.45rem; font-size:1rem;',
+  lg: '0.95rem 1.8rem; font-size:1.1rem;',
+}[size];
+
+const btnLayout = css({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+});
+
+const styleStr = `padding:${padMap} background:${themes.bg}; border:1.5px solid ${themes.border}; box-shadow:${themes.shadow}; color:${themes.color};`;
+---
+
+{href ? (
+  <a
+    id={id}
+    href={href}
+    class={`fluff-btn ${btnLayout}`}
+    style={styleStr}
+    target={external ? '_blank' : undefined}
+    rel={external ? 'noopener noreferrer' : undefined}
+  >
+    <slot />
+  </a>
+) : (
+  <button id={id} type={type} class={`fluff-btn ${btnLayout}`} style={styleStr}>
+    <slot />
+  </button>
+)}

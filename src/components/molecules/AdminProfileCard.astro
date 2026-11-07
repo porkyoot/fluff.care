@@ -1,0 +1,61 @@
+---
+import type { AccentColorName } from '../../tokens/palette';
+import RetroWindowFrame from '../atoms/RetroWindowFrame.astro';
+import NeonBadge from '../atoms/NeonBadge.astro';
+import GlowHeading from '../atoms/GlowHeading.astro';
+
+interface Props {
+  name: string;
+  handle: string;
+  role: string;
+  website?: string;
+  avatar: string;
+  accentColor: AccentColorName;
+  mcIgn?: string;
+}
+
+const { name, handle, role, website, avatar, accentColor, mcIgn } = Astro.props;
+const cardHref = website ?? 'https://discord.gg/dSWArwRJBt';
+---
+
+<a
+  href={cardHref}
+  target="_blank"
+  rel="noopener noreferrer"
+  style="text-decoration:none; color:inherit; display:block;"
+>
+  <RetroWindowFrame title={`ADMIN // ${name.toUpperCase()}`} accent={accentColor} rightTag={handle}>
+    <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
+      <div style="width:112px; height:112px; border-radius:9999px; padding:4px; background:linear-gradient(135deg, #ff3399, #00f0ff, #ffe600); box-shadow:0 0 25px rgba(255, 51, 153, 0.4);">
+        <img
+          src={avatar}
+          alt={`${name} profile portrait`}
+          style="width:100%; height:100%; border-radius:9999px; object-fit:cover; border:3px solid #160c2e;"
+          loading="lazy"
+        />
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
+        <NeonBadge label={role} color={accentColor} />
+        {mcIgn && <NeonBadge label={`MC: ${mcIgn}`} color="purple" pulse={false} />}
+      </div>
+
+      <div>
+        <GlowHeading as="h3" size="md" gradient="rainbow">
+          {name}
+        </GlowHeading>
+        <p style="font-family:var(--font-mono); font-size:0.82rem; color:#b3f5ff; margin-top:2px;">
+          {handle}
+        </p>
+      </div>
+
+      <div class="cozy-prose" style="font-size:0.96rem;">
+        <slot />
+      </div>
+
+      <div style="margin-top:4px; font-family:var(--font-display); font-weight:700; font-size:0.88rem; color:#ffb3d9;">
+        {website ? `🌐 Visit ${website.replace('https://', '')} →` : '💬 Say hi on Discord →'}
+      </div>
+    </div>
+  </RetroWindowFrame>
+</a>

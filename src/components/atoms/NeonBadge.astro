@@ -1,0 +1,30 @@
+---
+import { css } from '../../../styled-system/css';
+import { ACCENT_THEMES, type AccentColorName } from '../../tokens/palette';
+
+interface Props {
+  label: string;
+  color?: AccentColorName;
+  pulse?: boolean;
+}
+
+const { label, color = 'cyan', pulse = true } = Astro.props;
+const palette = ACCENT_THEMES[color];
+
+const badgeLayout = css({
+  display: 'inline-flex',
+  alignItems: 'center',
+});
+---
+
+<span
+  class={`fluff-badge ${badgeLayout}`}
+  style={`background:${palette.bg}; border:1.5px solid ${palette.border}; color:${palette.text}; box-shadow:0 0 16px ${palette.bg};`}
+>
+  {pulse && (
+    <span
+      style={`width:8px; height:8px; border-radius:9999px; background:${palette.dot}; box-shadow:0 0 10px ${palette.dot}; display:inline-block;`}
+    />
+  )}
+  {label}
+</span>

@@ -1,0 +1,46 @@
+---
+import { CARE_FLUFF_STRINGS } from '../i18n/strings';
+import CozyLandingTemplate from '../components/templates/CozyLandingTemplate.astro';
+import Navbar from '../components/organisms/Navbar.astro';
+import HeroSection from '../components/organisms/HeroSection.astro';
+import MascotTributeSection from '../components/organisms/MascotTributeSection.astro';
+import FeaturesGridSection from '../components/organisms/FeaturesGridSection.astro';
+import CommunityGuideSection from '../components/organisms/CommunityGuideSection.astro';
+import AdminsSection from '../components/organisms/AdminsSection.astro';
+import Footer from '../components/organisms/Footer.astro';
+
+import * as mascotMd from '../content/sections/mascot-story.md';
+import * as rulesMd from '../content/sections/cozy-rules.md';
+
+const MascotContent = mascotMd.Content;
+---
+
+<CozyLandingTemplate
+  title={CARE_FLUFF_STRINGS.siteTitle}
+  description={CARE_FLUFF_STRINGS.siteDescription}
+>
+  <Navbar slot="navbar" />
+  <HeroSection slot="hero" />
+
+  <FeaturesGridSection slot="features" />
+
+  <MascotTributeSection
+    slot="mascot"
+    title={mascotMd.frontmatter.title}
+    subtitle={mascotMd.frontmatter.subtitle}
+    badge={mascotMd.frontmatter.badge}
+  >
+    <MascotContent />
+  </MascotTributeSection>
+
+  <CommunityGuideSection
+    slot="guide"
+    rulesTitle={rulesMd.frontmatter.title}
+    rulesSubtitle={rulesMd.frontmatter.subtitle}
+    rulesBadge={rulesMd.frontmatter.badge}
+    categories={rulesMd.frontmatter.categories}
+  />
+
+  <AdminsSection slot="admins" />
+  <Footer slot="footer" />
+</CozyLandingTemplate>

@@ -1,0 +1,23 @@
+version: '3'
+
+tasks:
+  build:
+    desc: 'Generate PandaCSS tokens and build static Astro site into dist/'
+    cmds:
+      - pnpm run build
+
+  deploy:pages:
+    desc: 'Deploy static website (fluff.care) to Cloudflare Pages'
+    cmds:
+      - pnpm run build
+      - /usr/bin/env wrangler pages deploy dist --project-name=fluff-care
+
+  deploy:map-worker:
+    desc: 'Deploy BlueMap port-forwarding Cloudflare Worker (map.fluff.care -> 109.239.158.180:25969)'
+    cmds:
+      - /usr/bin/env wrangler deploy --config workers/map-proxy/wrangler.toml
+
+  deploy:dc-worker:
+    desc: 'Deploy Discord invite redirect Cloudflare Worker (dc.fluff.care -> https://discord.gg/dSWArwRJBt)'
+    cmds:
+      - /usr/bin/env wrangler deploy --config workers/dc-redirect/wrangler.toml

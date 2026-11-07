@@ -1,0 +1,27 @@
+---
+import { css } from '../../../styled-system/css';
+
+interface Props {
+  id?: string;
+  initialText?: string;
+}
+
+const { id = 'mc-live-status', initialText = 'Checking Care Fluff realm...' } = Astro.props;
+
+const boxLayout = css({
+  display: 'inline-flex',
+  alignItems: 'center',
+});
+---
+
+<div
+  id={id}
+  class={boxLayout}
+  style="gap:10px; padding:0.45rem 1rem; border-radius:9999px; background:rgba(15, 8, 32, 0.68); border:1.5px solid rgba(0, 255, 200, 0.45); box-shadow:0 0 18px rgba(0, 255, 200, 0.2); font-family:var(--font-mono); font-size:0.75rem; color:#a6ffea;"
+>
+  <span
+    data-status-dot
+    style="width:10px; height:10px; border-radius:999px; background:#00ffc8; box-shadow:0 0 12px #00ffc8; display:inline-block;"
+  />
+  <span data-status-text>{initialText}</span>
+</div>

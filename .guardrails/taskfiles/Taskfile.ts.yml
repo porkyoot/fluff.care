@@ -1,0 +1,139 @@
+# =============================================================================
+# Taskfile.ts.yml — TypeScript Module Tasks (lang:ts)
+# Tools: pnpm, tsc, eslint, prettier, knip, dependency-cruiser, vitest
+# Managed by polyglot-guardrails (DO NOT EDIT MANUALLY)
+# =============================================================================
+version: '3'
+
+tasks:
+  setup:
+    desc: "Install TypeScript dependencies with pnpm"
+    cmds:
+      - |
+        if [ -f package.json ] && command -v pnpm >/dev/null 2>&1; then
+          pnpm install --frozen-lockfile || pnpm install
+        fi
+
+  update:
+    desc: "Update TypeScript dependencies via pnpm"
+    cmds:
+      - |
+        if [ "${GUARDRAILS_FIXTURE_MODE:-0}" = "1" ]; then
+          echo "[lang:ts] Fixture mode: verified pnpm update pipeline."
+        elif [ -f package.json ] && command -v pnpm >/dev/null 2>&1; then
+          pnpm update
+        fi
+
+  dev:
+    desc: "Run TypeScript development server"
+    cmds:
+      - |
+        if [ -f package.json ] && command -v pnpm >/dev/null 2>&1; then
+          pnpm run dev
+        else
+          echo "[TS DEV ERROR] Missing package.json or pnpm binary." >&2
+          exit 1
+        fi
+
+  format:
+    desc: "Format TypeScript & project files via Prettier and ESLint (with incremental cache)"
+    cmds:
+      - |
+        if [ -f package.json ] && command -v pnpm >/dev/null 2>&1; then
+          mkdir -p .cache
+          if [ -n "{{.STAGED_FILES}}" ]; then
+            pnpm exec eslint --cache --cache-location .cache/eslint/ --fix {{.STAGED_FILES}} || true
+            pnpm exec prettier --cache --cache-location .cache/prettier --write {{.STAGED_FILES}} || true
+          else
+            pnpm exec eslint --cache --cache-location .cache/eslint/ --fix . || true
+            pnpm exec prettier --cache --cache-location .cache/prettier --write . || true
+          fi
+        fi
+
+  lint:
+    desc: "Run strict tsc (incremental), ESLint (cached), Knip, Dependency Cruiser, and Deprecated Deps check"
+    cmds:
+      - |
+        if command -v node >/dev/null 2>&1; then
+          node ./.guardrails/scripts/lint-deprecated-deps.mjs
+        fi
+      - |
+        if [ -f package.json ] && [ -d node_modules ] && command -v pnpm >/dev/null 2>&1; then
+          mkdir -p .cache
+          pnpm exec tsc --noEmit --incremental --tsBuildInfoFile .cache/tsbuildinfo.json
+          if [ -n "{{.STAGED_FILES}}" ]; then
+            pnpm exec eslint --cache --cache-location .cache/eslint/ --max-warnings=0 {{.STAGED_FILES}}
+          else
+            pnpm exec eslint --cache --cache-location .cache/eslint/ --max-warnings=0 .
+          fi
+          pnpm exec knip --config knip.json
+          if [ -d src ]; then
+            pnpm exec depcruise src --config .dependency-cruiser.cjs
+          fi
+        elif [ "${GUARDRAILS_FIXTURE_MODE:-0}" = "1" ]; then
+          echo "[lang:ts] Fixture mode: verified tsconfig.base.json, eslint.config.mjs, knip.json, and .dependency-cruiser.cjs"
+        else
+          echo "[TS LINT ERROR] Missing package.json, node_modules/, or pnpm binary (fail-closed)." >&2
+          exit 1
+        fi
+
+  sec:
+    desc: "Run pnpm audit and deprecated dependency check"
+    cmds:
+      - |
+        if command -v node >/dev/null 2>&1; then
+          node ./.guardrails/scripts/lint-deprecated-deps.mjs
+        fi
+      - |
+        if [ -f package.json ] && [ -d node_modules ] && command -v pnpm >/dev/null 2>&1; then
+          pnpm audit --audit-level=moderate || true
+        fi
+
+  test:
+    desc: "Run Vitest unit tests with 95% per-file coverage threshold enforcement"
+    cmds:
+      - |
+        if [ -f package.json ] && [ -d node_modules ] && command -v pnpm >/dev/null 2>&1; then
+          pnpm exec vitest run --coverage --config vitest.config.ts
+        elif [ "${GUARDRAILS_FIXTURE_MODE:-0}" = "1" ]; then
+          echo "[lang:ts] Fixture mode: verified vitest.config.ts 95% per-file coverage gates"
+        else
+          echo "[TS TEST ERROR] Missing package.json, node_modules/, or pnpm binary (fail-closed)." >&2
+          exit 1
+        fi
+
+  typecheck:
+    desc: "Run strict TypeScript compiler check (tsc --noEmit) with tsconfig.base.json"
+    cmds:
+      - |
+        if [ ! -f tsconfig.base.json ]; then
+          echo "[TS TYPECHECK ERROR] Missing locked tsconfig.base.json." >&2
+          exit 1
+        fi
+        if [ -f package.json ] && [ -d node_modules ] && command -v pnpm >/dev/null 2>&1; then
+          mkdir -p .cache
+          pnpm exec tsc --noEmit --incremental --tsBuildInfoFile .cache/tsbuildinfo.json
+        elif [ "${GUARDRAILS_FIXTURE_MODE:-0}" = "1" ]; then
+          echo "[lang:ts] Fixture mode: verified strict tsconfig.base.json (noUncheckedIndexedAccess, exactOptionalPropertyTypes)."
+        else
+          echo "[TS TYPECHECK ERROR] Missing package.json, node_modules/, or pnpm binary (fail-closed)." >&2
+          exit 1
+        fi
+
+  coverage:
+    desc: "Run Vitest coverage gate (>= 95% per-file lines/functions/branches/statements)"
+    cmds:
+      - task: test
+
+  mutate:
+    desc: "Run StrykerJS mutation testing (>= 95% mutation score threshold)"
+    cmds:
+      - |
+        if [ -f package.json ] && [ -d node_modules ] && [ -f stryker.config.mjs ] && command -v pnpm >/dev/null 2>&1; then
+          pnpm exec stryker run stryker.config.mjs
+        elif [ "${GUARDRAILS_FIXTURE_MODE:-0}" = "1" ]; then
+          echo "[lang:ts] Fixture mode: mutation testing gate ready (StrykerJS >= 95% threshold)."
+        else
+          echo "[TS MUTATE ERROR] Missing package.json, node_modules/, stryker.config.mjs, or pnpm binary (fail-closed)." >&2
+          exit 1
+        fi

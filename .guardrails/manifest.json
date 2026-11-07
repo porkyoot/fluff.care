@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "master_source": "https://github.com/aptitek/metadevkit.git",
+  "master_commit": "f9094e0",
+  "modules": [
+    "core",
+    "lang:ts",
+    "addon:ui-guardrails",
+    "fw:astro",
+    "fw:react",
+    "addon:cloudflare",
+    "addon:content-md",
+    "addon:design-system",
+    "addon:testing-fortress"
+  ]
+}

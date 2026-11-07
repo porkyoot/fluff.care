@@ -1,0 +1,34 @@
+---
+import { css } from '../../../styled-system/css';
+import { ACCENT_THEMES, type AccentColorName } from '../../tokens/palette';
+
+interface Props {
+  title: string;
+  accent?: AccentColorName;
+  rightTag?: string;
+}
+
+const { title, accent = 'cyan', rightTag = 'CARE-OS v26.3' } = Astro.props;
+const palette = ACCENT_THEMES[accent];
+
+const titleBarLayout = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+---
+
+<div class="pillow-glass fluff-window" style={`border-color:${palette.border};`}>
+  <div class={`fluff-window-bar ${titleBarLayout}`} style={`background:${palette.headerBg};`}>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="width:11px; height:11px; border-radius:999px; background:#ff66b8; box-shadow:0 0 8px #ff66b8; display:inline-block;" />
+      <span style="width:11px; height:11px; border-radius:999px; background:#ffe600; box-shadow:0 0 8px #ffe600; display:inline-block;" />
+      <span style="width:11px; height:11px; border-radius:999px; background:#00f0ff; box-shadow:0 0 8px #00f0ff; display:inline-block;" />
+      <span style="margin-left:8px; font-weight:700; letter-spacing:0.05em;">{title}</span>
+    </div>
+    <span style="opacity:0.75;">{rightTag}</span>
+  </div>
+  <div class="fluff-window-body">
+    <slot />
+  </div>
+</div>

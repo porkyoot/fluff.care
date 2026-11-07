@@ -1,0 +1,13 @@
+name = "fluff-care-map-proxy"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+routes = [
+  { pattern = "map.fluff.care", custom_domain = true }
+]
+
+[vars]
+ORIGIN_HOST = "carefur.nitro.games"
+ORIGIN_IP = "109.239.158.180"
+ORIGIN_PORT = "25969"
+

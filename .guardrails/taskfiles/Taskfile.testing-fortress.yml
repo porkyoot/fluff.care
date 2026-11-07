@@ -1,0 +1,45 @@
+# =============================================================================
+# Taskfile.testing-fortress.yml — Polyglot Testing Fortress (addon:testing-fortress)
+# Enforces Lock 6 (Test Assertion Purity across TS/Python/Java/Kotlin/PHP),
+# 1:1 TDD Companions, Cross-Language Mutation Testing, and Playwright + Axe E2E.
+# Managed by polyglot-guardrails (DO NOT EDIT MANUALLY)
+# =============================================================================
+version: '3'
+
+tasks:
+  lint:
+    desc: "Verify Lock 6 test assertion purity across all languages and 1:1 TDD companions"
+    cmds:
+      - bash .guardrails/scripts/validate-testing-fortress.sh .
+
+  test:
+    desc: "Verify Lock 6 test assertion purity and 1:1 TDD companions"
+    cmds:
+      - bash .guardrails/scripts/validate-testing-fortress.sh .
+
+  mutate:
+    desc: "Verify cross-language mutation testing configuration (StrykerJS / mutmut / PITest / Infection)"
+    cmds:
+      - |
+        if [ ! -f stryker.config.mjs ] && [ ! -f .guardrails/python/mutmut.toml ] && [ ! -f .guardrails/java/pitest.gradle.kts ] && [ ! -f .guardrails/kotlin/pitest-kotlin.gradle.kts ] && [ ! -f infection.json5 ]; then
+          echo "[TESTING FORTRESS ERROR] No language mutation configuration found." >&2
+          exit 1
+        fi
+
+  mutation:
+    desc: "Alias for mutate (StrykerJS / mutmut / PITest / Infection)"
+    cmds:
+      - task: mutate
+
+  e2e:
+    desc: "Run Playwright E2E + Axe WCAG 2.2 AA verification"
+    cmds:
+      - |
+        if [ -f package.json ] && [ -d node_modules ] && command -v pnpm >/dev/null 2>&1 && [ -d e2e ]; then
+          pnpm exec playwright test
+        elif [ "${GUARDRAILS_FIXTURE_MODE:-0}" = "1" ]; then
+          echo "[addon:testing-fortress] Fixture mode: verified playwright.config.ts."
+        else
+          echo "[E2E ERROR] Missing package.json, node_modules/, pnpm, or e2e/ directory (fail-closed)." >&2
+          exit 1
+        fi

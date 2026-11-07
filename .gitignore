@@ -1,0 +1,56 @@
+# =============================================================================
+# .gitignore — Managed by polyglot-guardrails (DO NOT EDIT MANUALLY)
+# Active modules: core lang:ts addon:ui-guardrails fw:astro fw:react addon:cloudflare addon:content-md addon:design-system addon:testing-fortress
+# For project-specific ignore rules, create '.gitignore.local'.
+# =============================================================================
+
+# --- Module: core ---
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*~
+.env
+.env.*
+!.env.example
+!.env.template
+tmp/
+reports/
+.cache/
+.task/
+
+# --- Module: lang:ts ---
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.eslintcache
+.wireit/
+
+# --- Module: fw:astro ---
+.astro/
+
+# --- Module: addon:cloudflare ---
+.wrangler/
+.dev.vars
+
+# --- Module: addon:design-system ---
+styled-system/
+
+# --- Module: addon:testing-fortress ---
+playwright-report/
+test-results/
+.stryker-tmp/
+
+# --- Project-specific (.gitignore.local) ---
+secrets.md
+ressources/
+.cache/
+coverage/
+reports/
+styled-system/
+.astro/
+.stryker-tmp/
+lefthook-local.yml

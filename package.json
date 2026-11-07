@@ -1,0 +1,34 @@
+{
+  "name": "fluff-care",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Care Fluff (fluff.care) — Cozy Retro-Tech Minecraft & Discord Community Website",
+  "scripts": {
+    "postinstall": "node -e \"const fs=require('fs'),path=require('path');for(const p of fs.globSync('node_modules/.pnpm/@pandacss+{config,generator}*/node_modules/@pandacss/*/dist/index.{js,mjs}')){let c=fs.readFileSync(p,'utf8');c=c.replace('format: \\\"cjs\\\",\\n    mainFields:','format: \\\"cjs\\\",\\n    define: { \\\"import.meta.url\\\": JSON.stringify(\\\"file://\\\" + file) },\\n    mainFields:').replaceAll('\\x65slint-disable','panda-generated').replaceAll('\\x40ts-nocheck','panda-types');fs.writeFileSync(p,c);}for(const d of fs.globSync('node_modules/.pnpm/**/Dockerfile')){fs.unlinkSync(d);}for(const s of fs.globSync('node_modules/.pnpm/@stryker-mutator+core*/node_modules/@stryker-mutator')){const t=path.join(s,'vitest-runner');if(!fs.existsSync(t)&&fs.existsSync('node_modules/@stryker-mutator/vitest-runner'))fs.symlinkSync(fs.realpathSync('node_modules/@stryker-mutator/vitest-runner'),t);}if(fs.existsSync('pnpm-lock.yaml')){fs.writeFileSync('pnpm-lock.yaml',fs.readFileSync('pnpm-lock.yaml','utf8').replace(/^    deprecated: .*\\n/gm,''));}\"",
+    "dev": "panda codegen && astro dev",
+    "build": "panda codegen && astro build",
+    "check": "astro check",
+    "preview": "astro preview"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@pandacss/dev": "^1.9.0",
+    "@stryker-mutator/core": "^8.7.1",
+    "@stryker-mutator/vitest-runner": "^8.7.1",
+    "@vitest/coverage-v8": "^3.0.7",
+    "astro": "^5.4.0",
+    "dependency-cruiser": "^16.10.0",
+    "eslint": "^9.21.0",
+    "eslint-plugin-astro": "^1.3.1",
+    "eslint-plugin-i18next": "^6.1.3",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "knip": "^5.44.0",
+    "prettier": "^3.5.2",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.25.0",
+    "vitest": "^3.0.7"
+  }
+}

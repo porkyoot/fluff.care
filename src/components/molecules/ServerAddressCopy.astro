@@ -1,0 +1,94 @@
+---
+import { css } from '../../../styled-system/css';
+import StatusIndicator from '../atoms/StatusIndicator.astro';
+import NeonBadge from '../atoms/NeonBadge.astro';
+
+const cardLayout = css({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+const addressRowLayout = css({
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+---
+
+<div
+  id="connect"
+  class={`pillow-glass ${cardLayout}`}
+  style="border-radius:2rem; padding:1.4rem; gap:1rem; max-width:640px;"
+>
+  <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;">
+    <StatusIndicator id="mc-live-status" initialText="Care Fluff • Ready for Hugs" />
+    <NeonBadge label="COZY MINECRAFT REALM" color="pink" />
+  </div>
+
+  <div
+    class={addressRowLayout}
+    style="gap:12px; padding:0.95rem 1.15rem; border-radius:1.4rem; background:rgba(12, 6, 26, 0.72); border:1.5px solid rgba(0, 240, 255, 0.42);"
+  >
+    <div style="display:flex; flex-direction:column; gap:2px;">
+      <span style="font-size:0.72rem; font-family:var(--font-mono); color:#ffb3d9; text-transform:uppercase; letter-spacing:0.08em;">
+        Minecraft Server Address
+      </span>
+      <code style="font-family:var(--font-mono); font-size:1.35rem; font-weight:700; color:#b3f5ff;">
+        mc.fluff.care
+      </code>
+      <span style="font-size:0.78rem; color:rgba(255,255,255,0.72);">
+        Click to copy and hop right into our world!
+      </span>
+    </div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button
+        type="button"
+        data-copy-ip="mc.fluff.care"
+        style="padding:0.6rem 1.2rem; border-radius:9999px; font-family:var(--font-display); font-weight:700; font-size:0.92rem; cursor:pointer; background:linear-gradient(135deg, rgba(255, 51, 153, 0.55) 0%, rgba(184, 41, 255, 0.55) 50%, rgba(0, 200, 255, 0.55) 100%); color:#fff7fc; border:1.5px solid rgba(255, 194, 229, 0.85); box-shadow:0 8px 24px rgba(255, 51, 153, 0.32);"
+      >
+        📋 Copy mc.fluff.care
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { formatPlayerStatus } from '../../domain/care-fluff';
+
+  const setNodeText = (node: Element | null, value: string): void => {
+    node?.replaceChildren(document.createTextNode(value));
+  };
+
+  const attachCopyHandler = (btn: HTMLButtonElement): void => {
+    const ip = btn.dataset.copyIp ?? 'mc.fluff.care';
+    btn.addEventListener('click', () => {
+      void navigator.clipboard
+        .writeText(ip)
+        .then(() => {
+          setNodeText(btn, '💖 Copied with a hug!');
+          setTimeout(() => setNodeText(btn, '📋 Copy mc.fluff.care'), 2200);
+        })
+        .catch(() => setNodeText(btn, ip));
+    });
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-ip]').forEach(attachCopyHandler);
+
+  const updateStatusText = (online: number, max: number): void => {
+    const txt = document.querySelector('#mc-live-status [data-status-text]');
+    setNodeText(txt, formatPlayerStatus(online, max));
+  };
+
+  const applyServerPayload = (payload: { players?: { online?: number; max?: number } }): void => {
+    const players = payload.players;
+    if (!players) return;
+    updateStatusText(Number(players.online), Number(players.max));
+  };
+
+  void fetch('https://api.mcsrvstat.us/3/mc.fluff.care')
+    .then((res) => res.json())
+    .then(applyServerPayload)
+    .catch(() => undefined);
+</script>

@@ -1,0 +1,202 @@
+@layer reset, base, tokens, recipes, utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700&family=Quicksand:wght@500;600;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  --font-display: 'Fredoka', 'Quicksand', system-ui, sans-serif;
+  --font-body: 'Quicksand', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  background-color: #140b29;
+  background-image:
+    radial-gradient(
+      circle at 15% 15%,
+      rgba(255, 51, 153, 0.22) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(0, 240, 255, 0.2) 0%,
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 50% 65%,
+      rgba(184, 41, 255, 0.22) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 20% 85%,
+      rgba(0, 255, 200, 0.14) 0%,
+      transparent 40%
+    ),
+    linear-gradient(180deg, #140b29 0%, #1d1038 45%, #160c2e 100%);
+  background-attachment: fixed;
+  color: #fdf7ff;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.retro-grid-bg {
+  background-size: 48px 48px;
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 51, 153, 0.06) 1px, transparent 1px);
+}
+
+.pillow-glass {
+  background: linear-gradient(
+    145deg,
+    rgba(22, 11, 46, 0.72) 0%,
+    rgba(32, 15, 62, 0.68) 50%,
+    rgba(16, 22, 52, 0.72) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  box-shadow:
+    0 20px 50px rgba(8, 3, 20, 0.62),
+    inset 0 1px 3px rgba(255, 255, 255, 0.28),
+    inset 0 -2px 6px rgba(184, 41, 255, 0.2);
+}
+
+.fluff-section {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 3.5rem 1.5rem;
+}
+
+.fluff-section-header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 2.5rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fluff-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.75rem;
+}
+
+.fluff-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.5rem;
+}
+
+.fluff-badge {
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  gap: 0.5rem;
+}
+
+.fluff-btn {
+  border-radius: 9999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-decoration: none;
+  gap: 0.6rem;
+  transition:
+    transform 0.22s ease,
+    filter 0.22s ease;
+}
+
+.fluff-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  filter: brightness(1.1);
+}
+
+.fluff-window {
+  border-radius: 2rem;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.fluff-window:hover {
+  transform: translateY(-4px);
+}
+
+.fluff-window-bar {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.fluff-window-body {
+  padding: 1.5rem;
+}
+
+.cozy-prose p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+  color: rgba(253, 247, 255, 0.92);
+  font-size: 1.05rem;
+}
+
+.cozy-prose strong {
+  color: #b3f5ff;
+  font-weight: 700;
+}
+
+.cozy-prose code {
+  font-family: var(--font-mono);
+  background: rgba(0, 240, 255, 0.14);
+  color: #a6ffea;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  font-size: 0.92em;
+}
+
+.cozy-prose ol,
+.cozy-prose ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.cozy-prose li {
+  line-height: 1.65;
+  color: rgba(253, 247, 255, 0.92);
+}
+
+.cozy-prose li::marker {
+  color: #ff66b8;
+  font-weight: 700;
+}
+
+@keyframes floatBubble {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-14px) scale(1.04);
+  }
+}
+
+.animate-float {
+  animation: floatBubble 5.5s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatBubble 6.5s ease-in-out 1.8s infinite;
+}

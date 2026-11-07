@@ -1,0 +1,9 @@
+secrets.md
+ressources/
+.cache/
+coverage/
+reports/
+styled-system/
+.astro/
+.stryker-tmp/
+lefthook-local.yml

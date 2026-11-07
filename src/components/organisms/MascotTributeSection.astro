@@ -1,0 +1,67 @@
+---
+import NeonBadge from '../atoms/NeonBadge.astro';
+import GlowHeading from '../atoms/GlowHeading.astro';
+import RetroWindowFrame from '../atoms/RetroWindowFrame.astro';
+
+interface Props {
+  title: string;
+  subtitle: string;
+  badge: string;
+}
+
+const { title, subtitle, badge } = Astro.props;
+---
+
+<section id="mascot" class="fluff-section">
+  <div class="fluff-section-header">
+    <NeonBadge label={badge} color="pink" />
+    <GlowHeading as="h2" size="lg" gradient="pinkCyan">
+      {title}
+    </GlowHeading>
+    <p style="font-size:1.08rem; color:rgba(253,247,255,0.85);">
+      {subtitle}
+    </p>
+  </div>
+
+  <div class="fluff-grid-2" style="align-items:center;">
+    <RetroWindowFrame title="ULLEVI // OUR FLUFFY GUARDIAN" accent="pink" rightTag="FOREVER IN OUR HEARTS">
+      <div class="cozy-prose">
+        <slot />
+      </div>
+    </RetroWindowFrame>
+
+    <RetroWindowFrame title="HERITAGE // ULLEVI & SIMONE'S MIYUKI" accent="purple" rightTag="KEEPSAKE">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:center;">
+        <div style="display:flex; flex-direction:column; gap:8px; text-align:center;">
+          <img
+            src="/images/mascot/ullevi-original.png"
+            alt="Original Ullevi Fox"
+            style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:1.25rem; border:2px solid #00f0ff;"
+            loading="lazy"
+          />
+          <span style="font-family:var(--font-display); font-weight:700; color:#b3f5ff; font-size:0.95rem;">
+            Ullevi
+          </span>
+          <span style="font-size:0.78rem; color:rgba(255,255,255,0.72);">
+            Synthwave magenta fur, neon cyan hair &amp; paw pads
+          </span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; text-align:center;">
+          <img
+            src="/images/mascot/miyuki-ref.jpeg"
+            alt="Miyuki — Simone's WIP Tanuki Fursona"
+            style="width:100%; aspect-ratio:1/1; object-fit:cover; object-position:left center; border-radius:1.25rem; border:2px solid #ffb3d9;"
+            loading="lazy"
+          />
+          <span style="font-family:var(--font-display); font-weight:700; color:#ffb3d9; font-size:0.95rem;">
+            Simone's Miyuki
+          </span>
+          <span style="font-size:0.78rem; color:rgba(255,255,255,0.72);">
+            Forehead &amp; cheek hearts, plush tanuki tail &amp; sweet spirit
+          </span>
+        </div>
+      </div>
+    </RetroWindowFrame>
+  </div>
+</section>

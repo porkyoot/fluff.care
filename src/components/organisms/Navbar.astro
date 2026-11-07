@@ -1,0 +1,55 @@
+---
+import { css } from '../../../styled-system/css';
+import PillowButton from '../atoms/PillowButton.astro';
+
+const navBarLayout = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
+const navLinkStyle = 'color:rgba(255,255,255,0.88); text-decoration:none; font-family:var(--font-display); font-weight:600;';
+---
+
+<header style="position:sticky; top:1rem; z-index:50; max-width:1280px; margin:0 auto; padding:0 1.25rem;">
+  <nav
+    class={`pillow-glass ${navBarLayout}`}
+    aria-label="Primary Navigation"
+    style="padding:0.75rem 1.35rem; border-radius:9999px; gap:1rem; flex-wrap:wrap;"
+  >
+    <a
+      href="#top"
+      style="display:flex; align-items:center; gap:12px; text-decoration:none; color:#fff;"
+    >
+      <img
+        src="/images/mascot/ullevi-hero.jpg"
+        alt="Ullevi"
+        style="width:44px; height:44px; border-radius:9999px; object-fit:cover; border:2px solid #00f0ff;"
+      />
+      <div style="display:flex; flex-direction:column;">
+        <span style="font-family:var(--font-display); font-size:1.3rem; font-weight:700; line-height:1.05; color:#ffb3d9;">
+          Care Fluff
+        </span>
+        <span style="font-family:var(--font-mono); font-size:0.68rem; color:#a6ffea;">
+          fluff.care
+        </span>
+      </div>
+    </a>
+
+    <div style="display:flex; align-items:center; gap:1.35rem; flex-wrap:wrap;">
+      <a href="#features" style={navLinkStyle}>✨ Realms</a>
+      <a href="#mascot" style={navLinkStyle}>💜 Ullevi</a>
+      <a href="#guide" style={navLinkStyle}>🌈 Rules</a>
+      <a href="#admins" style={navLinkStyle}>🐾 Crew</a>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px;">
+      <PillowButton href="https://map.fluff.care" variant="cyan" size="sm" external={true}>
+        🗺️ 3D Map
+      </PillowButton>
+      <PillowButton href="https://discord.gg/dSWArwRJBt" variant="pink" size="sm" external={true}>
+        💬 Discord
+      </PillowButton>
+    </div>
+  </nav>
+</header>

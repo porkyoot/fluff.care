@@ -1,0 +1,79 @@
+---
+import './Aurora.css';
+import { AURORA_CARE_FLUFF_STOPS } from '../../tokens/palette';
+
+interface Props {
+  colorStops?: readonly string[];
+  amplitude?: number;
+  blend?: number;
+  height?: number;
+  speed?: number;
+  scale?: number;
+  glow?: number;
+  brightness?: number;
+  layers?: number;
+  direction?: 'top' | 'bottom';
+  mouseInteraction?: boolean;
+  intro?: boolean;
+  opacity?: number;
+  lightMode?: boolean;
+  time?: number;
+  paused?: boolean;
+  dpr?: number;
+  className?: string;
+  style?: string;
+}
+
+const {
+  colorStops = AURORA_CARE_FLUFF_STOPS,
+  amplitude = 1,
+  blend = 0.5,
+  height = 0.45,
+  speed = 1,
+  scale = 1,
+  glow = 0.6,
+  brightness = 1,
+  layers = 1,
+  direction = 'top',
+  mouseInteraction = true,
+  intro = true,
+  opacity = 1,
+  lightMode = false,
+  time,
+  paused = false,
+  dpr,
+  className = '',
+  style,
+} = Astro.props;
+
+const auroraPayload = JSON.stringify({
+  colorStops,
+  amplitude,
+  blend,
+  height,
+  speed,
+  scale,
+  glow,
+  brightness,
+  layers,
+  direction,
+  mouseInteraction,
+  intro,
+  opacity,
+  lightMode,
+  time,
+  paused,
+  dpr,
+});
+---
+
+<div
+  class={`aurora-container${className ? ` ${className}` : ''}`}
+  style={style}
+  data-aurora={auroraPayload}
+>
+  <canvas class="aurora-canvas" aria-hidden="true"></canvas>
+</div>
+
+<script is:inline src="/scripts/aurora.js"></script>
+

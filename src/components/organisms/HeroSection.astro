@@ -1,0 +1,53 @@
+---
+import { css } from '../../../styled-system/css';
+import NeonBadge from '../atoms/NeonBadge.astro';
+import GlowHeading from '../atoms/GlowHeading.astro';
+import ServerAddressCopy from '../molecules/ServerAddressCopy.astro';
+
+const artWrapLayout = css({
+  position: 'relative',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+---
+
+<section id="top" class="fluff-section">
+  <div class="fluff-grid-2" style="align-items:center; gap:2.5rem;">
+    <div style="display:flex; flex-direction:column; gap:1.35rem;">
+      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+        <NeonBadge label="CARE FLUFF SANCTUARY" color="pink" />
+      </div>
+
+      <GlowHeading as="h1" size="xl" gradient="rainbow">
+        A Giant Soft Pillow of a Server for Cute &amp; Round Things ✨
+      </GlowHeading>
+
+      <p style="font-size:1.15rem; line-height:1.75; color:rgba(253, 247, 255, 0.92); max-width:620px;">
+        Welcome to <strong style="color:#ffb3d9;">Care Fluff</strong> — a cozy, pastel-neon community built on kindness and warmth, where everyone can feel safe, happy, and right at home like a warm hug.
+      </p>
+
+      <ServerAddressCopy />
+    </div>
+
+    <div class={artWrapLayout}>
+      <div
+        class="animate-float"
+        style="position:relative; width:100%; max-width:470px; border-radius:3rem; padding:12px; background:linear-gradient(135deg, rgba(255,51,153,0.45), rgba(0,240,255,0.45), rgba(255,230,0,0.35)); box-shadow:0 25px 70px rgba(184, 41, 255, 0.42);"
+      >
+        <img
+          src="/images/mascot/ullevi-hero.jpg"
+          alt="Ullevi waving with glowing cyan paw pads and soft heart markings"
+          style="width:100%; height:auto; display:block; border-radius:2.5rem; border:2px solid rgba(255,255,255,0.45);"
+        />
+
+        <div
+          class="pillow-glass"
+          style="position:absolute; top:-14px; left:-10px; padding:0.55rem 1.1rem; border-radius:9999px; font-family:var(--font-display); font-weight:700; font-size:0.84rem; color:#ffb3d9;"
+        >
+          💜 Ullevi
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,57 @@
+---
+import type { AccentColorName } from '../../tokens/palette';
+import NeonBadge from '../atoms/NeonBadge.astro';
+import GlowHeading from '../atoms/GlowHeading.astro';
+import AdminProfileCard from '../molecules/AdminProfileCard.astro';
+
+interface AdminFrontmatter {
+  name: string;
+  handle: string;
+  role: string;
+  website?: string;
+  avatar: string;
+  accentColor: AccentColorName;
+  mcIgn?: string;
+  order: number;
+}
+
+interface MarkdownAdminModule {
+  frontmatter: AdminFrontmatter;
+  Content: astroHTML.JSX.Element;
+}
+
+const adminModules = Object.values(
+  import.meta.glob<MarkdownAdminModule>('../../content/admins/*.md', { eager: true })
+).sort((a, b) => a.frontmatter.order - b.frontmatter.order);
+---
+
+<section id="admins" class="fluff-section">
+  <div class="fluff-section-header">
+    <NeonBadge label="CARE FLUFF GUARDIANS" color="purple" />
+    <GlowHeading as="h2" size="lg" gradient="pinkCyan">
+      Meet the Cozy Crew 🐾💖
+    </GlowHeading>
+    <p style="font-size:1.08rem; color:rgba(253,247,255,0.85);">
+      The friendly paws &amp; wings looking after Care Fluff on Minecraft and Discord. Reach out anytime for whitelist access or a warm chat!
+    </p>
+  </div>
+
+  <div class="fluff-grid-3">
+    {adminModules.map((mod) => {
+      const BioContent = mod.Content;
+      return (
+        <AdminProfileCard
+          name={mod.frontmatter.name}
+          handle={mod.frontmatter.handle}
+          role={mod.frontmatter.role}
+          website={mod.frontmatter.website}
+          avatar={mod.frontmatter.avatar}
+          accentColor={mod.frontmatter.accentColor}
+          mcIgn={mod.frontmatter.mcIgn}
+        >
+          <BioContent />
+        </AdminProfileCard>
+      );
+    })}
+  </div>
+</section>

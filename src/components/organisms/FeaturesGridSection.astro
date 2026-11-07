@@ -1,0 +1,54 @@
+---
+import type { AccentColorName } from '../../tokens/palette';
+import NeonBadge from '../atoms/NeonBadge.astro';
+import GlowHeading from '../atoms/GlowHeading.astro';
+import FeatureCard from '../molecules/FeatureCard.astro';
+
+interface FeatureFrontmatter {
+  title: string;
+  badge: string;
+  icon: string;
+  accentColor: AccentColorName;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  image?: string;
+  order: number;
+}
+
+interface MarkdownFeatureModule {
+  frontmatter: FeatureFrontmatter;
+  Content: astroHTML.JSX.Element;
+}
+
+const featureModules = Object.values(
+  import.meta.glob<MarkdownFeatureModule>('../../content/features/*.md', { eager: true })
+).sort((a, b) => a.frontmatter.order - b.frontmatter.order);
+---
+
+<section id="features" class="fluff-section">
+  <div class="fluff-section-header">
+    <NeonBadge label="OUR TWO REALMS" color="cyan" />
+    <GlowHeading as="h2" size="lg" gradient="purpleTeal">
+      Discord Community &amp; Minecraft World ✨
+    </GlowHeading>
+  </div>
+
+  <div class="fluff-grid-2">
+    {featureModules.map((mod) => {
+      const ItemContent = mod.Content;
+      return (
+        <FeatureCard
+          title={mod.frontmatter.title}
+          badge={mod.frontmatter.badge}
+          icon={mod.frontmatter.icon}
+          accentColor={mod.frontmatter.accentColor}
+          ctaLabel={mod.frontmatter.ctaLabel}
+          ctaUrl={mod.frontmatter.ctaUrl}
+          image={mod.frontmatter.image}
+        >
+          <ItemContent />
+        </FeatureCard>
+      );
+    })}
+  </div>
+</section>

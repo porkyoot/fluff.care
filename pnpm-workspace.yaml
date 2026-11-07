@@ -1,0 +1,7 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+  fluff-care: true
+overrides:
+  '@babel/plugin-proposal-explicit-resource-management': 'npm:@babel/plugin-transform-explicit-resource-management@^7.28.0'
+  glob: '^11.0.0'

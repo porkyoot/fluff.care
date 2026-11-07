@@ -1,0 +1,28 @@
+---
+interface Props {
+  as?: 'h1' | 'h2' | 'h3';
+  size?: 'xl' | 'lg' | 'md';
+  gradient?: 'pinkCyan' | 'rainbow' | 'purpleTeal' | 'sunny';
+}
+
+const { as: Tag = 'h2', size = 'lg', gradient = 'pinkCyan' } = Astro.props;
+
+const gradients = {
+  pinkCyan: 'linear-gradient(95deg, #ffc2e2 0%, #ebd1ff 48%, #a6f9ff 100%)',
+  rainbow: 'linear-gradient(90deg, #ffc2e2 0%, #fff5c2 32%, #b8fff0 66%, #ebd1ff 100%)',
+  purpleTeal: 'linear-gradient(95deg, #ebd1ff 0%, #c2f7ff 52%, #b8fff0 100%)',
+  sunny: 'linear-gradient(95deg, #fff5c2 0%, #ffdcc2 50%, #ffc2e2 100%)',
+}[gradient];
+
+const sizeStyles = {
+  xl: 'font-size:clamp(2.2rem, 4.2vw, 3.5rem); line-height:1.12;',
+  lg: 'font-size:clamp(1.75rem, 3vw, 2.55rem); line-height:1.18;',
+  md: 'font-size:clamp(1.3rem, 2vw, 1.6rem); line-height:1.25;',
+}[size];
+---
+
+<Tag
+  style={`font-family:var(--font-display); font-weight:700; text-shadow:none; ${sizeStyles} background:${gradients}; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; filter:drop-shadow(0 2px 14px rgba(255, 102, 184, 0.32));`}
+>
+  <slot />
+</Tag>

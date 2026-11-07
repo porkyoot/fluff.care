@@ -1,0 +1,11 @@
+name = "fluff-care-dc-redirect"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+routes = [
+  { pattern = "dc.fluff.care", custom_domain = true }
+]
+
+[vars]
+DISCORD_INVITE_URL = "https://discord.gg/dSWArwRJBt"
+

@@ -1,0 +1,65 @@
+---
+import type { AccentColorName } from '../../tokens/palette';
+import NeonBadge from '../atoms/NeonBadge.astro';
+import GlowHeading from '../atoms/GlowHeading.astro';
+import RetroWindowFrame from '../atoms/RetroWindowFrame.astro';
+
+export interface RuleCategoryItem {
+  readonly icon: string;
+  readonly title: string;
+  readonly tag: string;
+  readonly accent: AccentColorName;
+  readonly summary: string;
+  readonly items: readonly string[];
+}
+
+interface Props {
+  rulesTitle: string;
+  rulesSubtitle: string;
+  rulesBadge: string;
+  categories: readonly RuleCategoryItem[];
+}
+
+const { rulesTitle, rulesSubtitle, rulesBadge, categories } = Astro.props;
+---
+
+<section id="guide" class="fluff-section">
+  <div class="fluff-section-header">
+    <NeonBadge label={rulesBadge} color="teal" />
+    <GlowHeading as="h2" size="lg" gradient="rainbow">
+      {rulesTitle} 🌈
+    </GlowHeading>
+    <p style="font-size:1.08rem; color:rgba(253,247,255,0.92); max-width:680px;">
+      {rulesSubtitle}
+    </p>
+  </div>
+
+  <div class="fluff-grid-2">
+    {categories.map((cat) => (
+      <RetroWindowFrame
+        title={`${cat.icon} ${cat.title.toUpperCase()}`}
+        accent={cat.accent}
+        rightTag={cat.tag}
+      >
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div>
+            <GlowHeading as="h3" size="md" gradient="pinkCyan">
+              {cat.icon} {cat.title}
+            </GlowHeading>
+            <p style="font-size:0.95rem; color:#b3f5ff; margin-top:4px;">
+              {cat.summary}
+            </p>
+          </div>
+
+          <ul style="display:flex; flex-direction:column; gap:10px; padding-left:1.2rem; margin:0;">
+            {cat.items.map((item) => (
+              <li style="font-size:0.96rem; line-height:1.65; color:rgba(253,247,255,0.94);">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </RetroWindowFrame>
+    ))}
+  </div>
+</section>

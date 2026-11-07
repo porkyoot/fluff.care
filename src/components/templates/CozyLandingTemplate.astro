@@ -1,0 +1,63 @@
+---
+import '../../styles/global.css';
+import { AURORA_CARE_FLUFF_STOPS } from '../../tokens/palette';
+import Aurora from '../atoms/Aurora.astro';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="https://fluff.care/images/mascot/ullevi-hero.jpg" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#ff3399" />
+    <link rel="icon" type="image/jpeg" href="/images/mascot/ullevi-hero.jpg" />
+  </head>
+  <body class="retro-grid-bg">
+    <!-- Soft Ambient WebGL2 Aurora Backdrop (tuned for high text contrast) -->
+    <div
+      aria-hidden="true"
+      style="position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;"
+    >
+      <Aurora
+        colorStops={AURORA_CARE_FLUFF_STOPS}
+        amplitude={1.05}
+        blend={0.55}
+        height={0.46}
+        speed={0.85}
+        scale={0.9}
+        glow={0.6}
+        brightness={0.85}
+        layers={3}
+        direction="top"
+        mouseInteraction={true}
+        intro={true}
+        opacity={0.78}
+      />
+    </div>
+
+    <div style="position:relative; z-index:1;">
+      <slot name="navbar" />
+      <main>
+        <slot name="hero" />
+        <slot name="features" />
+        <slot name="mascot" />
+        <slot name="guide" />
+        <slot name="admins" />
+      </main>
+      <slot name="footer" />
+    </div>
+  </body>
+</html>
