@@ -6,6 +6,14 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': '*',
 };
 
+// Minecraft 26.3 (protocol 777) Login Handshake (next_state=2) + LoginStart("BlueMapWake")
+// Wakes Nitro Games' container sleep-proxy on port 25965 when the server is idle/paused.
+const MC_WAKE_PACKET = new Uint8Array([
+  20, 0, 137, 6, 13, 109, 99, 46, 102, 108, 117, 102, 102, 46, 99, 97, 114, 101,
+  101, 109, 2, 29, 0, 11, 66, 108, 117, 101, 77, 97, 112, 87, 97, 107, 101, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+]);
+
 function buildRawHttpRequest(request, originHost, originPort) {
   const url = new URL(request.url);
   const pathAndQuery = (url.pathname || '/') + (url.search || '');
@@ -206,6 +214,34 @@ async function readHttpResponse(readable, method) {
   return null;
 }
 
+async function wakeMinecraftServer(originHost, mcPort) {
+  const socket = connect({ hostname: originHost, port: mcPort });
+  try {
+    const writer = socket.writable.getWriter();
+    await writer.write(MC_WAKE_PACKET);
+    writer.releaseLock();
+    const reader = socket.readable.getReader();
+    await reader.read();
+    reader.releaseLock();
+  } catch {
+    // Ignore wake-up socket errors; follow-up BlueMap retry will verify readiness
+  } finally {
+    socket.close();
+  }
+}
+
+async function fetchFromBlueMap(request, originHost, originPort) {
+  const socket = connect({ hostname: originHost, port: originPort });
+  try {
+    const writer = socket.writable.getWriter();
+    await writer.write(buildRawHttpRequest(request, originHost, originPort));
+    writer.releaseLock();
+    return await readHttpResponse(socket.readable, request.method);
+  } finally {
+    socket.close();
+  }
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -220,13 +256,20 @@ export default {
     }
     const originHost = env.ORIGIN_HOST || 'carefur.nitro.games';
     const originPort = Number(env.ORIGIN_PORT || 25969);
-    const socket = connect({ hostname: originHost, port: originPort });
+    const mcPort = Number(env.MC_PORT || 25965);
+
     try {
-      const writer = socket.writable.getWriter();
-      await writer.write(buildRawHttpRequest(request, originHost, originPort));
-      writer.releaseLock();
-      const res = await readHttpResponse(socket.readable, request.method);
-      socket.close();
+      let res = null;
+      try {
+        res = await fetchFromBlueMap(request, originHost, originPort);
+      } catch {
+        await wakeMinecraftServer(originHost, mcPort);
+        res = await fetchFromBlueMap(request, originHost, originPort);
+      }
+      if (!res) {
+        await wakeMinecraftServer(originHost, mcPort);
+        res = await fetchFromBlueMap(request, originHost, originPort);
+      }
       if (!res) {
         return new Response('BlueMap starting on 25969', {
           status: 502,
@@ -241,7 +284,6 @@ export default {
         encodeBody: 'manual',
       });
     } catch (err) {
-      socket.close();
       return new Response(`BlueMap Proxy Error: ${err.message}`, {
         status: 502,
         headers: { ...CORS_HEADERS, 'Cache-Control': 'no-store' },
